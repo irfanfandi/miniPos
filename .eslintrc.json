@@ -1,3 +1,32 @@
 {
-  "extends": "next/core-web-vitals"
+  "env": {
+    "browser": true
+  },
+  "extends": ["plugin:react/recommended", "airbnb"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "plugins": ["react"],
+  "rules": {
+    "react/jsx-filename-extension": [1, {"extensions": [".js", ".jsx"]}],
+    "react/destructuring-assignment": "off",
+    "no-use-before-define": "off",
+    "no-unused-vars": "off",
+    "import/no-named-default": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/prop-types": "off",
+    "arrow-body-style": "off",
+    "no-underscore-dangle": "off",
+    "import/prefer-default-export": "off",
+    "no-sequences": "off",
+    "no-param-reassign": "off",
+    "no-return-assign": "off",
+    "max-len": "off",
+    "no-unused-expressions": "off",
+    "react/no-array-index-key": "off"
+  }
 }
