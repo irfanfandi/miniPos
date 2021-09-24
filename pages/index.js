@@ -1,10 +1,7 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
-import Dashboard from './dashboard'
+import MainLayout from '../layout/mainLayout'
 
 export default function Home() {
   return (
-    <Dashboard/>
+    <MainLayout title="Home" content={<div>Home</div>}/>
   )
 }
