@@ -25,12 +25,9 @@ export default function cardTransaction() {
   const [handleModal, setHandleModal] = React.useState(false);
   const initialPayload = {
     id: uuidv4(),
-    status_billing: true, //status billing, jika true artinya sudah bayar
-    total: 20000,
-    item_order: [
-      {id: 1, name: 'bubur', price: 10000},
-      {id: 2, name: 'bubur 2', price: 10000},
-    ],
+    status_billing: false, //status billing, jika true artinya sudah bayar
+    total: 0,
+    item_order: [],
   };
   const [payload, setPayload] = React.useState(initialPayload);
   const [, forceUpdate] = React.useReducer(x => x + 1, 0);
@@ -104,7 +101,7 @@ export default function cardTransaction() {
                             '&:last-child td, &:last-child th': {border: 0},
                           }}>
                           <TableCell>{row.name}</TableCell>
-                          <TableCell align="right">
+                          <TableCell>
                             {currencyFormatter.format(row.price, {code: 'IDR'})}
                           </TableCell>
                           <TableCell>
@@ -121,7 +118,7 @@ export default function cardTransaction() {
                     })}
                   <TableRow>
                     <TableCell>Total</TableCell>
-                    <TableCell align="right">
+                    <TableCell>
                       {currencyFormatter.format(dataTransaction.total, {
                         code: 'IDR',
                       })}

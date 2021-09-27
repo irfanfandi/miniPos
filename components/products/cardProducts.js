@@ -208,7 +208,9 @@ export default function cardCategory() {
               label="Price product"
               value={payload.price}
               type="number"
-              onChange={event => onInputChange('price', event.target.value)}
+              onChange={event =>
+                onInputChange('price', parseInt(event.target.value))
+              }
             />
             <TextField
               select
