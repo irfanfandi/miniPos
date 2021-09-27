@@ -122,7 +122,7 @@ function LayoutAuth(props) {
                 ? theme.palette.grey[100]
                 : theme.palette.grey[900],
             flexGrow: 1,
-            height: '100vh',
+            height: '120vh',
             overflow: 'auto',
           }}>
           <Toolbar />
