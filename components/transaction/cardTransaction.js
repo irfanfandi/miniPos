@@ -17,13 +17,14 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import {v4 as uuidv4} from 'uuid';
 import Swal from 'sweetalert2';
+import CardProduct from './cardProducts';
 
 export default function cardTransaction() {
   var currencyFormatter = require('currency-formatter');
   const [dataTransaction, setdataTransaction] = React.useState('');
   const [handleModal, setHandleModal] = React.useState(false);
   const initialPayload = {
-    id: 0,
+    id: uuidv4(),
     status_billing: true, //status billing, jika true artinya sudah bayar
     total: 20000,
     item_order: [
@@ -32,30 +33,31 @@ export default function cardTransaction() {
     ],
   };
   const [payload, setPayload] = React.useState(initialPayload);
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0);
 
   React.useEffect(() => {
     // Jika data pada localstore ada, maka dataTransaction state di set dengan data localstore
+    localStorage.setItem('dataTransaction', JSON.stringify(initialPayload));
     localStorage.getItem('dataTransaction') &&
       setdataTransaction(JSON.parse(localStorage.getItem('dataTransaction')));
     console.log(dataTransaction, 'sa');
   }, []);
 
   // Add data
-  const saveData = () => {
-    const id = uuidv4();
-    const newCategory = {id, name: payload.name};
-    setdataTransaction([...dataTransaction, newCategory]);
-    localStorage.setItem(
-      'dataTransaction',
-      JSON.stringify([...dataTransaction, newCategory]),
-    );
+  const handleAddProduct = dataItem => {
+    // Push data item dari parameter yang di kirim dari props
+    dataTransaction.item_order.push(dataItem);
+    dataTransaction.total = dataTransaction.total + dataItem.price;
+    setdataTransaction(dataTransaction);
+    forceUpdate();
+    localStorage.setItem('dataTransaction', JSON.stringify(dataTransaction));
     Swal.fire({
       icon: 'success',
       text: 'You have successfully add data!',
     });
-    setPayload(initialPayload);
-    setHandleModal(false);
   };
+
+  const submitPayment = () => {};
 
   // Delete data
   const deleteData = id => {
@@ -70,82 +72,105 @@ export default function cardTransaction() {
 
   return (
     <React.Fragment>
-      <Typography component="h2" variant="h6" color="primary" gutterBottom>
-        List Order
-      </Typography>
-      <TableContainer component={Paper}>
-        <Table
-          sx={{minWidth: 650}}
-          stickyHeaderstickyHeader
-          aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {dataTransaction &&
-              dataTransaction.item_order.map(row => {
-                return (
-                  <TableRow
-                    key={row.id}
-                    sx={{'&:last-child td, &:last-child th': {border: 0}}}>
-                    <TableCell>{row.name}</TableCell>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <Paper sx={{p: 4, display: 'flex', flexDirection: 'column'}}>
+            <Typography
+              component="h2"
+              variant="h6"
+              color="primary"
+              gutterBottom>
+              List Order
+            </Typography>
+            <TableContainer component={Paper}>
+              <Table
+                sx={{minWidth: 650}}
+                stickyHeaderstickyHeader
+                aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {dataTransaction &&
+                    dataTransaction.item_order.map(row => {
+                      return (
+                        <TableRow
+                          key={row.id}
+                          sx={{
+                            '&:last-child td, &:last-child th': {border: 0},
+                          }}>
+                          <TableCell>{row.name}</TableCell>
+                          <TableCell align="right">
+                            {currencyFormatter.format(row.price, {code: 'IDR'})}
+                          </TableCell>
+                          <TableCell>
+                            <IconButton
+                              aria-label="delete"
+                              onClick={() => {
+                                deleteData(row.id);
+                              }}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  <TableRow>
+                    <TableCell>Total</TableCell>
                     <TableCell align="right">
-                      {currencyFormatter.format(row.price, {code: 'IDR'})}
-                    </TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="delete"
-                        onClick={() => {
-                          deleteData(row.id);
-                        }}>
-                        <DeleteIcon />
-                      </IconButton>
+                      {currencyFormatter.format(dataTransaction.total, {
+                        code: 'IDR',
+                      })}
                     </TableCell>
                   </TableRow>
-                );
-              })}
-            <TableRow>
-              <TableCell>Total</TableCell>
-              <TableCell align="right">
-                {currencyFormatter.format(dataTransaction, {
-                  code: 'IDR',
-                })}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Modal
-        open={handleModal}
-        onClose={() => {
-          setHandleModal(false);
-        }}
-        center>
-        <FormControl>
-          <Grid
-            container
-            direction="column"
-            sx={{
-              display: 'flex',
-              '& > :not(style)': {m: 1, mt: 4},
-            }}>
-            <TextField
-              required
-              id="demo-helper-text-misaligned-no-helper"
-              label="Name category"
-              value={payload.name}
-              onChange={event => onInputChange('name', event.target.value)}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Modal
+              open={handleModal}
+              onClose={() => {
+                setHandleModal(false);
+              }}
+              center>
+              <FormControl>
+                <Grid
+                  container
+                  direction="column"
+                  sx={{
+                    display: 'flex',
+                    '& > :not(style)': {m: 1, mt: 4},
+                  }}>
+                  <TextField
+                    required
+                    id="demo-helper-text-misaligned-no-helper"
+                    label="Name category"
+                    value={payload.name}
+                    onChange={event =>
+                      onInputChange('name', event.target.value)
+                    }
+                  />
+                  <Button variant="contained" onClick={submitPayment}>
+                    Save
+                  </Button>
+                </Grid>
+              </FormControl>
+            </Modal>
+          </Paper>
+        </Grid>
+        <Grid item xs={6}>
+          <Paper sx={{p: 4, display: 'flex', flexDirection: 'column'}}>
+            <CardProduct
+              onAddProduct={val => {
+                handleAddProduct(val);
+              }}
             />
-            <Button variant="contained" onClick={saveData}>
-              Save
-            </Button>
-          </Grid>
-        </FormControl>
-      </Modal>
+          </Paper>
+        </Grid>
+      </Grid>
     </React.Fragment>
   );
 }

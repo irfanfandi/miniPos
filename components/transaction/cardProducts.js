@@ -13,7 +13,7 @@ import IconButton from '@mui/material/IconButton';
 import {v4 as uuidv4} from 'uuid';
 import Swal from 'sweetalert2';
 
-export default function cardProducts() {
+export default function cardProducts(props) {
   var currencyFormatter = require('currency-formatter');
   const [dataProduct, setdataProduct] = React.useState([]);
 
@@ -24,30 +24,12 @@ export default function cardProducts() {
   }, []);
 
   // Add data
-  const saveData = () => {
-    // Jika typeSubmit === add maka yg di jalankan insert data baru, jika tidak maka update data berdasarkan id
-    if (typeSubmit === 'add') {
-      const id = uuidv4();
-      const newCategory = {id, name: payload.name};
-      setdataProduct([...dataProduct, newCategory]);
-      localStorage.setItem(
-        'dataProduct',
-        JSON.stringify([...dataProduct, newCategory]),
-      );
-    } else {
-      // Mencari index array yg akan di ganti datanya
-      const indexData = dataProduct.findIndex(
-        category => category.id === payload.id,
-      );
-      dataProduct[indexData] = payload;
-      localStorage.setItem('dataProduct', JSON.stringify(dataProduct));
-    }
+  const addProduct = data => {
+    props.onAddProduct(data);
     Swal.fire({
       icon: 'success',
       text: 'You have successfully add data!',
     });
-    setPayload(initialPayload);
-    setHandleModal(false);
   };
 
   return (
@@ -84,9 +66,7 @@ export default function cardProducts() {
                       <IconButton
                         aria-label="add"
                         onClick={() => {
-                          setTypeSubit('update'),
-                            setPayload(row),
-                            setHandleModal(true);
+                          addProduct(row);
                         }}>
                         <AddIcon />
                       </IconButton>
