@@ -1,4 +1,4 @@
-# waste-collection
+# miniPos
 
 ## Build Setup
 
