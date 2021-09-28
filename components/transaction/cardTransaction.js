@@ -22,22 +22,28 @@ import CardProduct from './cardProducts';
 export default function cardTransaction() {
   var currencyFormatter = require('currency-formatter');
   const [dataTransaction, setdataTransaction] = React.useState('');
-  const [handleModal, setHandleModal] = React.useState(false);
+  const [dataBilling, setdataBilling] = React.useState([]);
   const initialPayload = {
     id: uuidv4(),
-    status_billing: false, //status billing, jika true artinya sudah bayar
     total: 0,
     item_order: [],
   };
-  const [payload, setPayload] = React.useState(initialPayload);
   const [, forceUpdate] = React.useReducer(x => x + 1, 0);
 
-  React.useEffect(() => {
-    // Jika data pada localstore ada, maka dataTransaction state di set dengan data localstore
+  const resetDataTransaction = () => {
+    setdataTransaction(initialPayload);
     localStorage.setItem('dataTransaction', JSON.stringify(initialPayload));
-    localStorage.getItem('dataTransaction') &&
-      setdataTransaction(JSON.parse(localStorage.getItem('dataTransaction')));
-    console.log(dataTransaction, 'sa');
+  };
+
+  React.useEffect(() => {
+    // Jika data pada localstore ada, maka dataTransaction state di set dengan data localstore jika tidak maka di set dengan initialdata
+    localStorage.getItem('dataTransaction') !== null
+      ? setdataTransaction(JSON.parse(localStorage.getItem('dataTransaction')))
+      : resetDataTransaction();
+
+    // Set data Biling
+    localStorage.getItem('dataBilling') &&
+      setdataBilling(JSON.parse(localStorage.getItem('dataBilling')));
   }, []);
 
   // Add data
@@ -54,17 +60,35 @@ export default function cardTransaction() {
     });
   };
 
-  const submitPayment = () => {};
+  const submitPayment = () => {
+    setdataBilling([...dataBilling, dataTransaction]);
+    localStorage.setItem(
+      'dataBilling',
+      JSON.stringify([...dataBilling, dataTransaction]),
+    );
+    Swal.fire({
+      icon: 'success',
+      text: 'You have successfully payment order!',
+    });
+    // Clear data transaction
+    resetDataTransaction();
+  };
 
   // Delete data
-  const deleteData = id => {
-    const deleteData = dataTransaction.filter(category => category.id !== id);
-    setdataTransaction(deleteData);
+  const deleteData = (id, price) => {
+    const deleteData = dataTransaction.item_order.filter(
+      transaction => transaction.id !== id,
+    );
+    // update data item order dan total order
+    dataTransaction.item_order = deleteData;
+    dataTransaction.total = dataTransaction.total - price;
+    setdataTransaction(dataTransaction);
+    forceUpdate();
     Swal.fire({
       icon: 'success',
       text: 'You have successfully deleted data!',
     });
-    localStorage.setItem('dataTransaction', JSON.stringify(deleteData));
+    localStorage.setItem('dataTransaction', JSON.stringify(dataTransaction));
   };
 
   return (
@@ -86,9 +110,9 @@ export default function cardTransaction() {
                 aria-label="sticky table">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell></TableCell>
+                    <TableCell sx={{width: '25%'}}>Name</TableCell>
+                    <TableCell sx={{width: '25%'}}>Price</TableCell>
+                    <TableCell sx={{width: '50%'}}>Action</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -108,7 +132,7 @@ export default function cardTransaction() {
                             <IconButton
                               aria-label="delete"
                               onClick={() => {
-                                deleteData(row.id);
+                                deleteData(row.id, row.price);
                               }}>
                               <DeleteIcon />
                             </IconButton>
@@ -127,35 +151,16 @@ export default function cardTransaction() {
                 </TableBody>
               </Table>
             </TableContainer>
-            <Modal
-              open={handleModal}
-              onClose={() => {
-                setHandleModal(false);
-              }}
-              center>
-              <FormControl>
-                <Grid
-                  container
-                  direction="column"
-                  sx={{
-                    display: 'flex',
-                    '& > :not(style)': {m: 1, mt: 4},
-                  }}>
-                  <TextField
-                    required
-                    id="demo-helper-text-misaligned-no-helper"
-                    label="Name category"
-                    value={payload.name}
-                    onChange={event =>
-                      onInputChange('name', event.target.value)
-                    }
-                  />
-                  <Button variant="contained" onClick={submitPayment}>
-                    Save
-                  </Button>
-                </Grid>
-              </FormControl>
-            </Modal>
+            {dataTransaction.total > 0 && (
+              <Button
+                sx={{mt: 2}}
+                variant="contained"
+                onClick={() => {
+                  submitPayment();
+                }}>
+                Pay order
+              </Button>
+            )}
           </Paper>
         </Grid>
         <Grid item xs={6}>

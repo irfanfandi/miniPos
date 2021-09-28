@@ -15,7 +15,6 @@ import 'react-responsive-modal/styles.css';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
-import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import {v4 as uuidv4} from 'uuid';
 import Swal from 'sweetalert2';
@@ -119,7 +118,7 @@ export default function cardCategory() {
             <TableRow>
               <TableCell>Id Category</TableCell>
               <TableCell>Name Category</TableCell>
-              <TableCell></TableCell>
+              <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -174,26 +173,24 @@ export default function cardCategory() {
           setHandleModal(false);
         }}
         center>
-        <FormControl>
-          <Grid
-            container
-            direction="column"
-            sx={{
-              display: 'flex',
-              '& > :not(style)': {m: 1, mt: 4},
-            }}>
-            <TextField
-              required
-              id="demo-helper-text-misaligned-no-helper"
-              label="Name category"
-              value={payload.name}
-              onChange={event => onInputChange('name', event.target.value)}
-            />
-            <Button variant="contained" onClick={saveData}>
-              Save
-            </Button>
-          </Grid>
-        </FormControl>
+        <Grid
+          container
+          direction="column"
+          sx={{
+            display: 'flex',
+            '& > :not(style)': {m: 1, mt: 4},
+          }}>
+          <TextField
+            required
+            id="demo-helper-text-misaligned-no-helper"
+            label="Name category"
+            value={payload.name}
+            onChange={event => onInputChange('name', event.target.value)}
+          />
+          <Button variant="contained" onClick={saveData}>
+            Save
+          </Button>
+        </Grid>
       </Modal>
     </React.Fragment>
   );

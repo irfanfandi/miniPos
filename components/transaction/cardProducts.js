@@ -44,10 +44,9 @@ export default function cardProducts(props) {
           aria-label="sticky table">
           <TableHead>
             <TableRow>
-              <TableCell>Name Product</TableCell>
-              <TableCell>Price Product</TableCell>
-              <TableCell>Name Category</TableCell>
-              <TableCell></TableCell>
+              <TableCell sx={{width: '25%'}}>Name</TableCell>
+              <TableCell sx={{width: '25%'}}>Price</TableCell>
+              <TableCell sx={{width: '50%'}}>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -61,7 +60,6 @@ export default function cardProducts(props) {
                     <TableCell>
                       {currencyFormatter.format(row.price, {code: 'IDR'})}
                     </TableCell>
-                    <TableCell>{row.category}</TableCell>
                     <TableCell>
                       <IconButton
                         aria-label="add"
